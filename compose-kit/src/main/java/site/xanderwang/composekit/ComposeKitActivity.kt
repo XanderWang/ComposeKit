@@ -15,17 +15,24 @@
  */
 package site.xanderwang.composekit
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.TopAppBar
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import site.xanderwang.composekit.ui.theme.ComposeKitTheme
 
-class ComposeKitActivity : AppCompatActivity() {
+class ComposeKitActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -39,10 +46,57 @@ class ComposeKitActivity : AppCompatActivity() {
 // Start building your app here!
 @Composable
 fun ComposeKitApp() {
-    Surface(color = MaterialTheme.colors.background) {
-        Text(text = "Ready... Set... GO!")
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = "Compose Kit")
+                },
+                elevation = 6.dp
+            )
+        }
+    ) {
+        SimpleList(
+            list = listOf(
+                SimpleItem("Java", 0),
+                SimpleItem("Kotlin", 0),
+                SimpleItem("C++", 0)
+            )
+        )
     }
 }
+
+data class SimpleItem(var name: String, var count: Int)
+
+@Composable
+fun SimpleList(list: List<SimpleItem>) {
+    Column {
+        for (item in list) {
+            var mutableItem by remember {
+                mutableStateOf(item)
+            }
+            SimpleItemView(mutableItem) {
+                item.count++
+                mutableItem = SimpleItem(item.name, item.count)
+//                mutableItem = item
+            }
+        }
+    }
+}
+
+@Composable
+fun SimpleItemView(item: SimpleItem, onClickItem: () -> Unit) {
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(3.dp),
+        onClick = onClickItem
+    ) {
+        Text("I am ${item.name}, my count is: ${item.count}")
+    }
+
+}
+
 
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
 @Composable
@@ -52,7 +106,7 @@ fun LightPreview() {
     }
 }
 
-@Preview("Dark Theme", widthDp = 360, heightDp = 640)
+//@Preview("Dark Theme", widthDp = 360, heightDp = 640)
 @Composable
 fun DarkPreview() {
     ComposeKitTheme(darkTheme = true) {
